@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.log
+result
+cli-native
+native-sdk
+.nimble-purifier/
+nimble.paths
+config.nims
+nimbledeps/
+examples/minimal/example
+examples/minimal/tests/test

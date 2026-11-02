@@ -1,0 +1,77 @@
+{
+  "contentHash": "3a22b040a5e126e128058bab2e1d94bf2733a0247e006e8f306df9147ff65b8e",
+  "inputs": [
+    {
+      "hash": "335ad5e5b9fd7a0bde6adc9573ff3e7e9543f61dc018a6e24cf7657113528856",
+      "path": "example.nimble"
+    }
+  ],
+  "manifests": {
+    "example.nimble": "version = \"0.1.0\"\nauthor = \"the nix-purifier developers\"\ndescription = \"Locked Nimble example\"\nlicense = \"MIT\"\nsrcDir = \"src\"\nbin = @[\"example\"]\nrequires \"nim >= 2.2.0\", \"results == 0.5.1\"\n\ntask test, \"Test the locked dependency\":\n  exec \"nim c -r tests/test.nim\"\n"
+  },
+  "nativeHash": "2f76ec55f83c359100f1050b8168ba9f27144d0ffd3dac9974992ad6a03bc2cb",
+  "nativeLock": "{\n  \"version\": 2,\n  \"packages\": {\n    \"results\": {\n      \"version\": \"0.5.1\",\n      \"vcsRevision\": \"df8113dda4c2d74d460a8fa98252b0b771bf1f27\",\n      \"url\": \"https://github.com/arnetheduck/nim-results\",\n      \"downloadMethod\": \"git\",\n      \"dependencies\": [\n        \"nim\"\n      ],\n      \"checksums\": {\n        \"sha1\": \"a9c011f74bc9ed5c91103917b9f382b12e82a9e7\"\n      }\n    }\n  },\n  \"tasks\": {}\n}\n",
+  "profiles": {
+    "x86_64-linux": {
+      "binaries": [
+        "example"
+      ],
+      "dependencies": [
+        {
+          "aliases": [
+            "refs/tags/v0.5.1"
+          ],
+          "cacheName": "githubcom_arnetheducknimresults_purifier_5e7e1e619f3e42f66a124c26c7800a558707f3f45019f60da53766dd222e1640",
+          "name": "results",
+          "native": {
+            "checksums": {
+              "sha1": "a9c011f74bc9ed5c91103917b9f382b12e82a9e7"
+            },
+            "dependencies": [
+              "nim"
+            ],
+            "downloadMethod": "git",
+            "url": "https://github.com/arnetheduck/nim-results",
+            "vcsRevision": "df8113dda4c2d74d460a8fa98252b0b771bf1f27",
+            "version": "0.5.1"
+          },
+          "registry": {
+            "description": "Friendly, exception-free value-or-error returns, similar to Option[T]",
+            "license": "MIT",
+            "method": "git",
+            "name": "results",
+            "tags": [],
+            "url": "https://github.com/arnetheduck/nim-results",
+            "web": "https://github.com/arnetheduck/nim-results"
+          },
+          "source": "x86_64-linux/results-df8113dda4c2d74d460a8fa98252b0b771bf1f27"
+        }
+      ],
+      "entries": [
+        {
+          "git": {
+            "commitObject": {
+              "gitlinks": [],
+              "object": "dHJlZSAzMDY3YmNmYmQyNTNiM2E3ZGQzMjhkNTkwYWJmY2ZhZGIzODllMDllCnBhcmVudCA3MWQ0MDRiMzE0NDc5YTYyMDViZmQwNTBmNGZlNWZlNDljZGFmYzY5CmF1dGhvciBKYWNlayBTaWVrYSA8YXJuZXRoZWR1Y2tAZ21haWwuY29tPiAxNzMzNTgyNzQzICswMTAwCmNvbW1pdHRlciBKYWNlayBTaWVrYSA8YXJuZXRoZWR1Y2tAZ21haWwuY29tPiAxNzMzNTgyNzQzICswMTAwCgp2MC41LjE6IHJlbGVhc2UgbGVudCB3b3JrYXJvdW5kCg=="
+            },
+            "leaveDotGit": true,
+            "rev": "df8113dda4c2d74d460a8fa98252b0b771bf1f27",
+            "submodules": false,
+            "url": "https://github.com/arnetheduck/nim-results"
+          },
+          "hash": "sha256-KbNqt0FMuzDF4X+XM6JEaZJBypLDnvVPpnBpE7Sq6sA=",
+          "path": "x86_64-linux/results-df8113dda4c2d74d460a8fa98252b0b771bf1f27"
+        }
+      ],
+      "nativeLock": "{\n  \"version\": 2,\n  \"packages\": {\n    \"results\": {\n      \"version\": \"0.5.1\",\n      \"vcsRevision\": \"df8113dda4c2d74d460a8fa98252b0b771bf1f27\",\n      \"url\": \"https://github.com/arnetheduck/nim-results\",\n      \"downloadMethod\": \"git\",\n      \"dependencies\": [\n        \"nim\"\n      ],\n      \"checksums\": {\n        \"sha1\": \"a9c011f74bc9ed5c91103917b9f382b12e82a9e7\"\n      }\n    }\n  },\n  \"tasks\": {}\n}\n",
+      "system": "x86_64-linux",
+      "toolVersions": {
+        "nim": "2.2.12",
+        "nimble": "0.26.0",
+        "resolver": "526d5505d4796098c301adc413f94af87a03b07640ee6f062c1ddd1e81e975cf",
+        "sdk": "0abea549c05b4eb39461747f2c2357b676bd338f3f3f7d9df43ea6ed8143cfaf"
+      }
+    }
+  },
+  "version": 1
+}

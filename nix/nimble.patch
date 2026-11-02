@@ -1,0 +1,73 @@
+--- a/src/nimblepkg/options.nim
++++ b/src/nimblepkg/options.nim
+@@ -607,6 +607,18 @@
+   putEnv("PATH", getAppDir() & PathSep & nimBinDir & PathSep & getEnv("PATH"))
+ 
+ proc setNimbleDir*(options: var Options) =
++  let purifierDir = getEnv("NIMBLE_PURIFIER_DIR")
++  if purifierDir.len != 0:
++    options.config.nimbleDir = purifierDir
++    options.nimbleDir = purifierDir
++    options.offline = true
++    options.disableLockFile = false
++    options.localdeps = false
++    options.explicitGlobal = false
++    options.lockFileName = getEnv("NIMBLE_PURIFIER_NATIVE_LOCKFILE")
++    options.developFile = purifierDir / "disabled-develop"
++    if options.action.typ == actionInstall:
++      options.action.global = false
+   var
+     nimbleDir = options.config.nimbleDir
+     propagate = false
+--- a/src/nimblepkg/syncfile.nim
++++ b/src/nimblepkg/syncfile.nim
+@@ -35,6 +35,9 @@
+   pkgInfo.myPath.splitFile.dir
+ 
+ proc getSyncFilePath(pkgInfo: PackageInfo): Path =
++  let purifierSync = getEnv("NIMBLE_PURIFIER_SYNC_FILE")
++  if purifierSync.len != 0:
++    return purifierSync.Path
+   ## Returns a path to the sync file for package `pkgInfo`.
+ 
+   let (vcsType, vcsSpecialDirPath) =
+--- a/src/nimble.nim
++++ b/src/nimble.nim
+@@ -1990,6 +1990,8 @@
+     displayInfo(&"\"{nimbleConfigFileName}\" is already set up.", msgPriority)
+ 
+ proc setupVcsIgnoreFile =
++  if getEnv("NIMBLE_PURIFIER_DIR").len != 0:
++    return
+   ## Adds the names of some files which should not be committed to the VCS
+   ## ignore file.
+   let
+@@ -2156,7 +2156,7 @@
+   if options.task.len > 0 and options.task in rootPackage.taskRequires:
+     options.satResult.rootPackage.requires &= rootPackage.taskRequires[options.task]  
+   #when locking we need to add the task requires to the root package
+-  if options.action.typ == actionLock:
++  if options.action.typ == actionLock or (options.action.typ == actionSetup and getEnv("NIMBLE_PURIFIER_DIR").len != 0):
+     for task in rootPackage.taskRequires.keys:
+       options.satResult.rootPackage.requires &= rootPackage.taskRequires[task]
+   withNimBinFallback(nimBin, options):
+@@ -2724,7 +2724,7 @@
+     # For develop without --withDependencies, no solving happened - skip setup
+     if opt.action.typ == actionDevelop and not opt.action.withDependencies:
+       shouldRunSetup = false
+-    if opt.action.typ == actionCustom and not opt.localdeps:
++    if opt.action.typ == actionCustom and not opt.localdeps and getEnv("NIMBLE_PURIFIER_DIR").len == 0:
+       shouldRunSetup = false
+     # Generate config.nims BEFORE doAction so test tasks can find deps
+     if shouldRunSetup:
+--- a/src/nimblepkg/packageinfo.nim
++++ b/src/nimblepkg/packageinfo.nim
+@@ -685,7 +685,7 @@
+ 
+ iterator lockedDepsFor*(allDeps: AllLockFileDeps, options: Options): (string, LockFileDep) =
+   for task, deps in allDeps:
+-    if task in [noTask, options.task]:
++    if task in [noTask, options.task] or getEnv("NIMBLE_PURIFIER_DIR").len != 0 or (options.action.typ == actionLock and getEnv("NIMBLE_PURIFIER_SYNC_FILE").len != 0):
+       for name, dep in deps:
+         yield (name, dep)
+ 

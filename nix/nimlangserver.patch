@@ -1,0 +1,37 @@
+--- a/lstransports.nim
++++ b/lstransports.nim
+@@ -3,6 +3,8 @@
+ import std/[syncio, os, json, strutils, strformat, streams, oids, sequtils, times]
+ import ls, utils
+ import protocol/types, chronos/threadsync
++when defined(posix):
++  from posix import exitnow
+ 
+ type
+   LspClientResponse* = object
+@@ -260,8 +262,12 @@
+   let onExit: OnExitCallback = proc() {.async.} =
+     case ls.transportMode
+     of stdio:
+-      ls.outStream.close()
+-      freeShared(ls.stdinContext)
++      # The stdin worker still owns stdinContext. Freeing it under that worker
++      # crashes the server instead of completing the LSP exit notification.
++      when defined(posix):
++        exitnow(if ls.serverMode == lsp and not ls.isShutdown: 1 else: 0)
++      else:
++        quit(if ls.serverMode == lsp and not ls.isShutdown: 1 else: 0)
+     of socket:
+       ls.srv.close()
+ 
+--- a/nimlangserver.nim
++++ b/nimlangserver.nim
+@@ -139,7 +139,7 @@
+ 
+     result = result.strip()
+ 
+-  let section = readme.split("## Configuration Options")[1].split("##")[0]
++  let section = readme.split("### Configuration")[1].split("##")[0]
+   echo formatForConsole(section)
+   quit(0)
+ 
