@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 {
   lib,
+  callPackage,
   runCommand,
   fetchgit,
   python3,
@@ -19,6 +20,7 @@
   nimbleLock ? src + "/nimble.lock",
   fetchers ? { },
   nativeBuildInputs ? [ ],
+  nativeProducts ? { },
   doCheck ? true,
   buildCommand ? ''
     nimble -y build
@@ -65,7 +67,7 @@ let
       && !(type == "regular" && builtins.pathExists (path + ".nim"))
       && !(builtins.elem (lib.removePrefix ((toString src) + "/") path) binaryPaths);
   };
-  project =
+  rawProject =
     runCommand "purified-nimble-project"
       {
         nativeBuildInputs = [
@@ -94,6 +96,11 @@ let
         ${lib.optionalString doCheck "nimble -y test"}
         ${installCommand}
       '';
+  native = callPackage ./build-native-products.nix { inherit purifier nim toolchain; } {
+    inherit nativeProducts source environment nativeBuildInputs;
+  };
+  projections = if nativeProducts == { } then { } else native.projections;
+  project = rawProject // { inherit projections; };
   release =
     runCommand "nimble-project-release"
       {
@@ -111,11 +118,13 @@ let
         tar --sort=name --mtime=@1 --owner=0 --group=0 --numeric-owner -C source -cf - . | gzip -n > "$out/project.tar.gz"
       '';
 in
+assert nativeProducts == { } || native.validated;
 {
   packages = {
     inherit environment project;
     default = project;
-  };
+  } // lib.optionalAttrs (nativeProducts != { }) { native = native.producer; };
+  inherit projections;
   tests = project;
   inherit release;
   fetches = lock.entries;
