@@ -176,3 +176,26 @@ run, shell, setup and inspection commands use the prepared environment.
 
 The purifier idea was inspired by nixcloud's
 [cargo (libnix)](https://github.com/nixcloud/cargo).
+
+### JavaScript products
+
+`buildNimbleProject` can compile an owned production module with the Nim SDK's
+JavaScript backend, using the same captured Nimble dependencies:
+
+```nix
+browserProducts.answer = {
+  module = "src/browser.nim";
+  webjar = { artifactId = "nim-answer"; version = "0.1.0"; };
+};
+```
+
+`packages.browser` retains the project, generated `assets/answer/main.js`, and
+`browser-products.json` with the compiler's actual source graph and hashes.
+`projections.browser.answer` exposes `web.documentRoot`,
+`java-resources.classPath`, and, when WebJar coordinates are supplied, Maven and
+Ivy repositories. Ordinary Nim products keep their existing build identity.
+The application controls its JavaScript exports through native Nim declarations
+and `emit`; the adapter does not invent JavaScript entry points. Nimble manifests declaring `backend = "js"` can also be captured and built
+normally; their native JavaScript binaries install under `share/nimble-js`.
+The caller chooses its JavaScript runtime. The pure conformance check supplies
+Node and Chromium explicitly.

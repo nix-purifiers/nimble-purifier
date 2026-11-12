@@ -1,0 +1,5 @@
+import results
+proc answer*(offset: int): int {.exportc: "nimAnswer".} =
+  let value = Result[int, string].ok(42 + offset * 2)
+  result = value.get()
+{.emit: "globalThis.nimAnswer = `answer`;".}
