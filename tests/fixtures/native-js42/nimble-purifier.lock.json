@@ -1,5 +1,5 @@
 {
-  "contentHash": "98d71d170785550dbbb90a90580ea67390eccb8d96bcb3a166fd812d8a4802ec",
+  "contentHash": "81a8708d31154557dfc813edeaa581a5b661544d14f5df1eb7bc9605cbdfc018",
   "inputs": [
     {
       "hash": "47d8cea476d5db67ae35077bd3ac48b4068332baec5328050484aaa19309c297",
@@ -69,7 +69,7 @@
       "toolVersions": {
         "nim": "2.2.12",
         "nimble": "0.26.0",
-        "resolver": "b3118659f82cf2c9b50500827e4431f2832b9c7362534a668a269c7e3082d88a",
+        "resolver": "f587a472b3dbd826a936d752eb5ea52ff9265c0246b0f0f20aa9704445bdef1a",
         "sdk": "0abea549c05b4eb39461747f2c2357b676bd338f3f3f7d9df43ea6ed8143cfaf"
       }
     }
