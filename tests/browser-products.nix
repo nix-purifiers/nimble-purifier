@@ -10,6 +10,15 @@ let
   };
   a = build ./fixtures/js42 "0.1.0";
   b = build ./fixtures/js43 "0.2.0";
+  nativeOnly = pkgs.nimble-purifier.buildNimbleProject {
+    src = ./fixtures/js42;
+    nativeProducts.browser = { module="src/api.nim";abi="c";exports=["nimAnswer"]; };
+  };
+  combined = pkgs.nimble-purifier.buildNimbleProject {
+    src = ./fixtures/js42;
+    nativeProducts.browser = { module="src/api.nim";abi="c";exports=["nimAnswer"]; };
+    browserProducts.answer = { module="src/browser.nim";webjar={artifactId="nim-answer";version="0.1.0";}; };
+  };
   nativeJs = pkgs.nimble-purifier.buildNimbleProject {
     src = ./fixtures/native-js42; doCheck = false;
   };
@@ -32,6 +41,9 @@ HTML
     done
   '';
 in
+assert builtins.attrNames combined.projections == ["browser" "java-ffi" "native" "python-ffi"];
+assert combined.projections.native.drvPath == nativeOnly.projections.native.drvPath;
+assert combined.projections.browser.answer.web.drvPath == a.projections.browser.answer.web.drvPath;
 assert reject { module = "../browser.nim"; };
 assert reject { module = "/tmp/browser.nim"; };
 assert reject { module = "src/browser.nim"; flags = [ "--danger" ]; };
