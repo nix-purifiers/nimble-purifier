@@ -20,14 +20,14 @@
       forAll = nixpkgs.lib.genAttrs systems;
       overlay = final: prev: {
         nimble-purifier = final.lib.makeScope final.newScope (scope: {
-          nativeNimble = scope.callPackage ./nix/nimble.nix { };
-          nativeNimlangserver = scope.callPackage ./nix/nimlangserver.nix { };
-          toolchain = scope.callPackage ./nix/toolchain.nix { };
-          cli = scope.callPackage ./nix/cli.nix {
+          nativeNimble = scope.callPackage ./pkgs/build-nimble-project/nimble.nix { };
+          nativeNimlangserver = scope.callPackage ./pkgs/build-nimble-project/nimlangserver.nix { };
+          toolchain = scope.callPackage ./pkgs/build-nimble-project/toolchain.nix { };
+          cli = scope.callPackage ./pkgs/cli/default.nix {
             nixpkgsSrc = nixpkgs;
             purifierSrc = purifier;
           };
-          buildNimbleProject = scope.callPackage ./nix/build-project.nix {
+          buildNimbleProject = scope.callPackage ./pkgs/build-nimble-project/default.nix {
             purifier = import (purifier + "/nix/lib") { inherit (final) lib; };
           };
         });
@@ -46,7 +46,7 @@
         default = (pkgsFor system).nimble-purifier.cli;
         cli = self.packages.${system}.default;
       });
-      lib.nimble-purifier.readLock = import ./nix/read-lock.nix { lib = nixpkgs.lib; };
+      lib.nimble-purifier = (nixpkgs.lib.extend (import ./lib-overlays/default)).nimble-purifier;
       apps = forAll (system: {
         default = {
           type = "app";

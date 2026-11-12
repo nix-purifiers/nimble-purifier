@@ -28,7 +28,7 @@ def versions():
     return {
         "nim": os.environ["NIMBLE_PURIFIER_NIM_VERSION"],
         "nimble": os.environ["NIMBLE_PURIFIER_NIMBLE_VERSION"],
-        "sdk": hashlib.sha256((HERE / "nix/nimble.patch").read_bytes()).hexdigest(),
+        "sdk": hashlib.sha256((HERE / "pkgs/build-nimble-project/nimble.patch").read_bytes()).hexdigest(),
         "resolver": hashlib.sha256(
             b"".join(p.read_bytes() for p in sorted(Path(__file__).parent.glob("*.py")))
         ).hexdigest(),
@@ -194,7 +194,7 @@ def realize(root, native, companion, target="environment"):
     }
     expression = (
         "import "
-        + str(HERE / "nix/realize.nix")
+        + str(HERE / "pkgs/build-nimble-project/realize.nix")
         + " (builtins.fromJSON "
         + json.dumps(lock.canonical(args))
         + ")"

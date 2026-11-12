@@ -42,7 +42,9 @@
 }:
 let
   lock = purifier.checkLock (
-    import ./read-lock.nix { inherit lib; } { inherit src lockFile nimbleLock; }
+    import ../../lib-overlays/default/read-lock.nix { inherit lib; } {
+      inherit src lockFile nimbleLock;
+    }
   );
   environment = import ./environment.nix {
     inherit
@@ -97,10 +99,17 @@ let
         ${installCommand}
       '';
   native = callPackage ./build-native-products.nix { inherit purifier nim toolchain; } {
-    inherit nativeProducts source environment nativeBuildInputs;
+    inherit
+      nativeProducts
+      source
+      environment
+      nativeBuildInputs
+      ;
   };
   projections = if nativeProducts == { } then { } else native.projections;
-  project = rawProject // { inherit projections; };
+  project = rawProject // {
+    inherit projections;
+  };
   release =
     runCommand "nimble-project-release"
       {
@@ -123,7 +132,8 @@ assert nativeProducts == { } || native.validated;
   packages = {
     inherit environment project;
     default = project;
-  } // lib.optionalAttrs (nativeProducts != { }) { native = native.producer; };
+  }
+  // lib.optionalAttrs (nativeProducts != { }) { native = native.producer; };
   inherit projections;
   tests = project;
   inherit release;
