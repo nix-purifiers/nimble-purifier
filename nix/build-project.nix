@@ -21,6 +21,7 @@
   fetchers ? { },
   nativeBuildInputs ? [ ],
   nativeProducts ? { },
+  browserProducts ? { },
   doCheck ? true,
   buildCommand ? ''
     nimble -y build
@@ -99,7 +100,11 @@ let
   native = callPackage ./build-native-products.nix { inherit purifier nim toolchain; } {
     inherit nativeProducts source environment nativeBuildInputs;
   };
-  projections = if nativeProducts == { } then { } else native.projections;
+  browser = callPackage ../pkgs/nimble-browser-products { inherit purifier nim toolchain; } {
+    inherit browserProducts source environment nativeBuildInputs;
+  };
+  projections = (if nativeProducts == { } then { } else native.projections)
+    // (if browserProducts == { } then { } else { browser = browser.projections; });
   project = rawProject // { inherit projections; };
   release =
     runCommand "nimble-project-release"
@@ -119,11 +124,13 @@ let
       '';
 in
 assert nativeProducts == { } || native.validated;
+assert browserProducts == { } || browser.validated;
 {
   packages = {
     inherit environment project;
     default = project;
-  } // lib.optionalAttrs (nativeProducts != { }) { native = native.producer; };
+  } // lib.optionalAttrs (nativeProducts != { }) { native = native.producer; }
+    // lib.optionalAttrs (browserProducts != { }) { browser = browser.producer; };
   inherit projections;
   tests = project;
   inherit release;

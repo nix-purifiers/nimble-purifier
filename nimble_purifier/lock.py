@@ -68,6 +68,8 @@ def problems(root, native, data, system=None):
         if system and system not in profiles:
             raise ValueError("missing SDK profile for " + system)
         for platform, profile in profiles.items():
+            if profile.get("backend", "c") not in ("c", "cpp", "js"):
+                raise ValueError("unsupported native Nimble backend")
             if (
                 profile["system"] != platform
                 or profile["toolVersions"]["nim"] != "2.2.12"

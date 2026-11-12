@@ -120,8 +120,8 @@ def resolve(root, native, companion, update=False, names=()):
                 capture_output=True,
             ).stdout
         )
-        if package.get("backend", "c") not in ("c", "cpp"):
-            raise ValueError("the supplied SDK currently supports C and C++ backends")
+        if package.get("backend", "c") not in ("c", "cpp", "js"):
+            raise ValueError("unsupported native Nimble backend")
         binaries = [
             str(Path(package.get("binDir", "")) / name)
             for name in package.get("bin", [])
@@ -144,6 +144,7 @@ def resolve(root, native, companion, update=False, names=()):
         )
         profiles[SYSTEM] = {
             "system": SYSTEM,
+            "backend": package.get("backend", "c"),
             "binaries": binaries,
             "nativeLock": text,
             "dependencies": dependencies,
