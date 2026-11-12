@@ -97,6 +97,53 @@ tests and installs declared executables. `lockFile`, `nimbleLock`,
 `installCommand` customize the build. Output names are available during
 evaluation without building dependencies.
 
+### Native libraries for C, Python and Java
+
+Select explicit C ABI modules from the native package's source directory:
+
+```nix
+pkgs.nimble-purifier.buildNimbleProject {
+  src = ./.;
+  nativeProducts.answer = {
+    module = "src/api.nim";
+    abi = "c";
+    exports = [ "nimAnswer" ];
+    backend = "c"; # or "cpp"
+    memoryManager = "orc"; # also "arc" or "refc"
+  };
+}
+```
+
+Declare the functions' C ABI in the project, for example:
+
+```nim
+proc nimAnswer(input: cint): cint {.cdecl, exportc, dynlib.} =
+  input + 42
+```
+
+`packages.native` contains the compiled libraries, headers, pkg-config files
+and `native-products.json`. The compiler uses the captured Nimble paths and
+the pinned native SDK. Project-owned C/C++ helpers compiled by Nim remain part
+of that native build. Imported Nim sources and backend units are checked
+against project, captured-package and SDK ownership.
+
+`projections.native`, `projections.python-ffi` and `projections.java-ffi` expose
+the native libraries through the shared catalog. The Python view supplies
+`purifier_native.load(name)`; the Java view supplies `java.args`. Callers use
+compatible ctypes/CFFI or JNI/FFM signatures for the project's exported API.
+Include `nimble/answer.h`, or use the generated `answer.pc` with pkg-config.
+The companion header preserves native declaration types while namespacing its
+guard and expressing C linkage for C and C++ callers. Original compiler headers
+and generated backend source remain under `native-proof`.
+
+Initialize each library once before calling its API. Its namespaced initializer
+is recorded as `targets.<name>.runtime.init` in `catalog.json`; it takes no
+arguments and returns void. Keep initialization and calls on the same foreign
+thread, and keep the library loaded for the process lifetime. The catalog
+records that lifecycle; loading the Python view does not initialize the runtime.
+Distinct source revisions and products receive distinct initializer names.
+The current native-library projection supports native Linux builds.
+
 ## Releases
 
 ```sh

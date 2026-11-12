@@ -8,4 +8,5 @@ in
   environment = built.packages.environment;
   project = built.tests;
   release = built.release;
+  native-products = import ./native-products.nix { inherit pkgs; };
 }
