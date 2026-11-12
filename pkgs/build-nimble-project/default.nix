@@ -43,7 +43,9 @@
 }:
 let
   lock = purifier.checkLock (
-    import ./read-lock.nix { inherit lib; } { inherit src lockFile nimbleLock; }
+    import ../../lib-overlays/default/read-lock.nix { inherit lib; } {
+      inherit src lockFile nimbleLock;
+    }
   );
   environment = import ./environment.nix {
     inherit
@@ -98,9 +100,14 @@ let
         ${installCommand}
       '';
   native = callPackage ./build-native-products.nix { inherit purifier nim toolchain; } {
-    inherit nativeProducts source environment nativeBuildInputs;
+    inherit
+      nativeProducts
+      source
+      environment
+      nativeBuildInputs
+      ;
   };
-  browser = callPackage ../pkgs/nimble-browser-products { inherit purifier nim toolchain; } {
+  browser = callPackage ../nimble-browser-products { inherit purifier nim toolchain; } {
     inherit browserProducts source environment nativeBuildInputs;
   };
   projections = (if nativeProducts == { } then { } else native.projections)
