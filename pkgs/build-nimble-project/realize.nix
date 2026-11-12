@@ -16,11 +16,11 @@ let
     lockFile = /. + companion;
     nimbleLock = /. + nativeLock;
   };
-  lock = import ./read-lock.nix { inherit (pkgs) lib; } args;
+  lock = import ../../lib-overlays/default/read-lock.nix { inherit (pkgs) lib; } args;
 in
 if target == "environment" then
   pkgs.callPackage ./environment.nix { inherit purifier nativeNimble toolchain; } { inherit lock; }
 else if target == "release" then
-  (pkgs.callPackage ./build-project.nix { inherit purifier nativeNimble toolchain; } args).release
+  (pkgs.callPackage ./default.nix { inherit purifier nativeNimble toolchain; } args).release
 else
   throw "nimble-purifier: unknown target"

@@ -20,14 +20,14 @@ in
 stdenvNoCC.mkDerivation {
   pname = "nimble-purifier";
   version = "0.1.0";
-  src = ../.;
+  src = ../..;
   nativeBuildInputs = [ makeWrapper ];
   dontBuild = true;
   installPhase = ''
     mkdir -p "$out/bin" "$out/lib/nimble-purifier"
-    cp -r nimble_purifier nix "$out/lib/nimble-purifier/"
+    cp -r nimble_purifier pkgs lib-overlays "$out/lib/nimble-purifier/"
     install -m755 bin/nimble-purifier "$out/bin/nimble-purifier"
-    substituteInPlace "$out/lib/nimble-purifier/nix/realize.nix" \
+    substituteInPlace "$out/lib/nimble-purifier/pkgs/build-nimble-project/realize.nix" \
       --replace-fail '@nixpkgs@' '${nixpkgsSrc}' \
       --replace-fail '@purifier@' '${purifierSrc}'
     wrapProgram "$out/bin/nimble-purifier" \

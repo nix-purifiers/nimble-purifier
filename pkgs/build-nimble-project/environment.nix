@@ -56,7 +56,7 @@ runCommand "purified-nimble-environment"
   }
   ''
     export PYTHONDONTWRITEBYTECODE=1
-    python3 ${../nimble_purifier}/build.py ${metadata} ${sources} "$out"
+    python3 ${../../nimble_purifier}/build.py ${metadata} ${sources} "$out"
     ln -s ${toolchain} "$out/sdk"
     ln -s ${sources} "$out/sources"
   ''
